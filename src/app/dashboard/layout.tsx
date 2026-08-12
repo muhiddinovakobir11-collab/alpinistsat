@@ -8,6 +8,8 @@ import MobileMenuToggle from "@/components/MobileMenuToggle";
 
 export default async function DashboardLayout({
   children,
+}: {
+  children: React.ReactNode;
 }) {
   const { userId } = await auth();
   
@@ -26,7 +28,7 @@ export default async function DashboardLayout({
             August Predictions Available - Start Practicing!
           </div>
           <div>
-            <UserButton afterSignOutUrl="/" />
+            <UserButton />
           </div>
         </header>
         <main className={styles.pageContainer}>{children}</main>
