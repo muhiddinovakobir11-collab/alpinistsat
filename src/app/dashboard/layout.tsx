@@ -22,25 +22,24 @@ export default async function DashboardLayout({
       {/* Ambient Animated Background */}
       <div className="ambient-bg"></div>
 
-      {/* Marquee Ticker */}
-      <div className="marquee-container">
-        <div className="marquee-content">
-          <div className="marquee-item">🏆 Rustam G. - 1520 ball</div>
-          <div className="marquee-item">🚀 Malika B. - 1480 ball</div>
-          <div className="marquee-item">🔥 Jasur T. - 10 kunlik streak</div>
-          <div className="marquee-item">⭐ Alisher K. - Math 800</div>
-          <div className="marquee-item">💡 Sevara A. - 1550 ball</div>
-          {/* Duplicate for infinite loop effect */}
-          <div className="marquee-item">🏆 Rustam G. - 1520 ball</div>
-          <div className="marquee-item">🚀 Malika B. - 1480 ball</div>
-          <div className="marquee-item">🔥 Jasur T. - 10 kunlik streak</div>
-          <div className="marquee-item">⭐ Alisher K. - Math 800</div>
-          <div className="marquee-item">💡 Sevara A. - 1550 ball</div>
-        </div>
-      </div>
-
       <Sidebar />
       <div className={styles.mainContent}>
+        {/* Marquee Ticker */}
+        <div className="marquee-container">
+          <div className="marquee-content">
+            <div className="marquee-item">🏆 Rustam G. - 1520 ball</div>
+            <div className="marquee-item">🚀 Malika B. - 1480 ball</div>
+            <div className="marquee-item">🔥 Jasur T. - 10 kunlik streak</div>
+            <div className="marquee-item">⭐ Alisher K. - Math 800</div>
+            <div className="marquee-item">💡 Sevara A. - 1550 ball</div>
+            {/* Duplicate for infinite loop effect */}
+            <div className="marquee-item">🏆 Rustam G. - 1520 ball</div>
+            <div className="marquee-item">🚀 Malika B. - 1480 ball</div>
+            <div className="marquee-item">🔥 Jasur T. - 10 kunlik streak</div>
+            <div className="marquee-item">⭐ Alisher K. - Math 800</div>
+            <div className="marquee-item">💡 Sevara A. - 1550 ball</div>
+          </div>
+        </div>
         <div className="mobile-hide" style={{ display: 'none' }} id="mobile-menu-placeholder"></div>
         <MobileMenuToggle sidebarId="student-sidebar" />
         <header className={styles.header} style={{ paddingLeft: '4rem' }}>
