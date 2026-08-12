@@ -1,0 +1,124 @@
+.dashboardHeader {
+  margin-bottom: 2rem;
+}
+
+.dashboardHeader h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.dashboardHeader p {
+  color: var(--muted-foreground);
+}
+
+.grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.dailyPractice {
+  grid-column: 1 / -1;
+}
+
+.practiceHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.practiceIconBox {
+  width: 48px;
+  height: 48px;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.practiceFeatures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.featureItem strong {
+  color: var(--foreground);
+}
+
+.actionBanner {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.actionBanner h3 {
+  margin-bottom: 0.25rem;
+  font-weight: 600;
+}
+
+.actionBanner p {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.startBtn {
+  background-color: var(--primary-foreground);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.startBtn:hover {
+  background-color: #f1f5f9;
+}
+
+.countdownCard {
+  text-align: center;
+  padding: 2rem;
+}
+
+.countdownCard h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.targetCard {
+  text-align: center;
+  padding: 2rem;
+}
+
+.targetCard h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}

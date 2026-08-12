@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "name": "Basic Plan",
+    "price": 10,
+    "features": ["Access to Math Questions", "Standard Support"]
+  },
+  {
+    "id": 2,
+    "name": "Pro Plan",
+    "price": 15,
+    "features": ["AI Study Plan", "All 3,714 Questions", "Priority Support", "Analytics"]
+  }
+]

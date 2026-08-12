@@ -1,0 +1,191 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  
+  --primary: #0f172a;
+  --primary-foreground: #ffffff;
+  
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  
+  --border: #e2e8f0;
+  --ring: #94a3b8;
+  
+  --radius: 0.75rem;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  --success: #10b981;
+  --success-foreground: #ffffff;
+  
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+/* Animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animated-border {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  z-index: 1;
+}
+
+.animated-border::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    #10b981 90deg,
+    #3b82f6 180deg,
+    #8b5cf6 270deg,
+    transparent 360deg
+  );
+  animation: spin 3s linear infinite;
+  z-index: -2;
+}
+
+.animated-border::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: #fff;
+  border-radius: 10px;
+  z-index: -1;
+}
+
+/* Hide Clerk Dev Badge */
+body > div[style*="position: fixed"][style*="bottom"][style*="right"],
+body > div[style*="position:absolute"][style*="bottom"][style*="right"],
+.cl-devMode, .cl-devBadge, [class^="cl-internal-"] > div[style*="bottom"] {
+  display: none !important;
+}
+
+/* Extra Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes bounceAnim {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+.bounce-anim {
+  animation: bounceAnim 2s infinite ease-in-out;
+}
+
+@keyframes pulseAnim {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.95); }
+}
+.pulse-anim {
+  animation: pulseAnim 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.hover-scale {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hover-scale:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: var(--shadow-md);
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .mobile-col {
+    flex-direction: column !important;
+  }
+  .mobile-grid-1 {
+    grid-template-columns: 1fr !important;
+  }
+  .mobile-hide {
+    display: none !important;
+  }
+  .mobile-p-4 {
+    padding: 1rem !important;
+  }
+  .mobile-text-center {
+    text-align: center !important;
+    align-items: center !important;
+  }
+  .mobile-text-4xl {
+    font-size: 2.25rem !important;
+  }
+  .mobile-text-2xl {
+    font-size: 1.5rem !important;
+  }
+  .mobile-w-full {
+    width: 100% !important;
+  }
+  .mobile-gap-4 {
+    gap: 1rem !important;
+  }
+  .mobile-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 40;
+  }
+  .mobile-sidebar {
+    position: fixed !important;
+    top: 0;
+    left: -100%;
+    height: 100vh;
+    z-index: 50;
+    transition: left 0.3s ease;
+  }
+  .mobile-sidebar.open {
+    left: 0 !important;
+  }
+}
