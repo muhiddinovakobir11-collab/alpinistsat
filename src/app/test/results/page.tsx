@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Target, ArrowRight, BookOpen, Calculator } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
 
 interface TestResults {
   totalReading: number;
@@ -15,6 +16,8 @@ interface TestResults {
 export default function ResultsPage() {
   const [results, setResults] = useState<TestResults | null>(null);
   const [showCertificate, setShowCertificate] = useState(false);
+  const { user } = useUser();
+  const studentName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Student' : 'Student';
 
   useEffect(() => {
     const data = localStorage.getItem('testResults');
@@ -142,7 +145,7 @@ export default function ResultsPage() {
 
             {/* Student Info */}
             <div style={{ marginBottom: '3rem' }}>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.5rem 0' }}>Jane Doe</h3>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.5rem 0' }}>{studentName}</h3>
               <p style={{ color: '#64748b', margin: 0 }}>High School: Unknown High School</p>
             </div>
 

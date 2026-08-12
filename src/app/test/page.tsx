@@ -7,6 +7,7 @@ import Draggable from 'react-draggable';
 import styles from './test.module.css';
 import DesmosCalculator from '@/components/DesmosCalculator';
 import { mockQuestions, Question } from '@/data/mockTest';
+import { useUser } from '@clerk/nextjs';
 
 type Phase = 'RW1' | 'RW2' | 'BREAK' | 'M1' | 'M2' | 'SUBMITTING';
 
@@ -21,6 +22,8 @@ const PHASE_TIMES = {
 
 export default function TestPage() {
   const router = useRouter();
+  const { user } = useUser();
+  const studentName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Student' : 'Student';
   
   // Phase State
   const [currentPhase, setCurrentPhase] = useState<Phase>('RW1');
@@ -351,7 +354,7 @@ export default function TestPage() {
       </main>
 
       <footer className={styles.footer}>
-        <div className={styles.studentName}>Jane Doe</div>
+        <div className={styles.studentName}>{studentName}</div>
         
         <div className={styles.navigation}>
           <select 
