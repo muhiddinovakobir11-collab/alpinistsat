@@ -23,8 +23,8 @@
 :root.dark {
   --background: #0f172a;
   --foreground: #f8fafc;
-  --primary: #3b82f6;
-  --primary-foreground: #ffffff;
+  --primary: #f8fafc;
+  --primary-foreground: #0f172a;
   --card: #1e293b;
   --card-foreground: #f8fafc;
   --border: #334155;
@@ -79,7 +79,7 @@ button {
   position: relative;
   border-radius: 12px;
   overflow: hidden;
-  background: #fff;
+  background: var(--card);
   z-index: 1;
 }
 
@@ -106,7 +106,7 @@ button {
   content: '';
   position: absolute;
   inset: 2px;
-  background: #fff;
+  background: var(--card);
   border-radius: 10px;
   z-index: -1;
 }
@@ -151,14 +151,36 @@ body > div[style*="position:absolute"][style*="bottom"][style*="right"],
   box-shadow: var(--shadow-md);
 }
 
+/* Button Base Styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  border: none;
+  font-family: inherit;
+}
+.btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
 /* Interactive 3D Tilt Effect */
 .tilt-card {
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
   will-change: transform;
 }
 .tilt-card:hover {
-  transform: perspective(1000px) rotateX(2deg) rotateY(2deg) scale3d(1.02, 1.02, 1.02);
+  transform: translateY(-5px) scale(1.02);
 }
 
 /* Float Animation */

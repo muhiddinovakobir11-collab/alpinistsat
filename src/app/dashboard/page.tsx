@@ -51,7 +51,7 @@ export default function DashboardPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
           {/* News & Announcements */}
-          <div className="card hover-scale" style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden', padding: 0 }}>
+          <div className="card hover-scale" style={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', overflow: 'hidden', padding: 0 }}>
             <div style={{ position: 'relative', height: '200px' }}>
               <img 
                 src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
@@ -65,11 +65,11 @@ export default function DashboardPage() {
                 <p style={{ color: '#cbd5e1', fontSize: '1rem', fontWeight: 500 }}>Take the official Alpinist SAT Mock Test and earn your certificate.</p>
               </div>
             </div>
-            <div style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', borderTop: '1px solid #e2e8f0' }}>
-              <Bell size={20} color="#2563eb" />
+            <div style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', borderTop: '1px solid var(--border)' }}>
+              <Bell size={20} color="#3b82f6" />
               <div style={{ flex: 1 }}>
-                <h4 style={{ color: '#0f172a', fontWeight: 700, fontSize: '0.95rem' }}>August SAT Registration Closes Soon</h4>
-                <p style={{ color: '#64748b', fontSize: '0.875rem' }}>Make sure to register on CollegeBoard by July 25th.</p>
+                <h4 style={{ color: 'var(--foreground)', fontWeight: 700, fontSize: '0.95rem' }}>August SAT Registration Closes Soon</h4>
+                <p style={{ color: 'var(--muted-foreground)', fontSize: '0.875rem' }}>Make sure to register on CollegeBoard by July 25th.</p>
               </div>
             </div>
           </div>
@@ -101,9 +101,9 @@ export default function DashboardPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
           {/* Daily Missions & Quests */}
-          <div className="card" style={{ backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '1.5rem' }}>
+          <div className="card tilt-card" style={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', padding: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Flame size={20} color="#f97316" /> Daily Missions
               </h2>
               <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#f97316' }}>3 Days Streak!</span>
@@ -111,30 +111,30 @@ export default function DashboardPage() {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'rgba(22, 163, 74, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <CheckCircle2 size={20} color="#16a34a" />
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>Solve 10 Math Questions</span>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--foreground)' }}>Solve 10 Math Questions</span>
                     <span style={{ fontSize: '0.85rem', color: '#16a34a', fontWeight: 700 }}>Done</span>
                   </div>
-                  <div style={{ width: '100%', height: '6px', backgroundColor: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ width: '100%', height: '6px', backgroundColor: 'var(--border)', borderRadius: '3px', overflow: 'hidden' }}>
                     <div style={{ width: '100%', height: '100%', backgroundColor: '#16a34a' }}></div>
                   </div>
                 </div>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Volume2 size={20} color="#64748b" />
+                <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Volume2 size={20} color="var(--muted-foreground)" />
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                    <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>Voice Vocab Practice</span>
-                    <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 600 }}>0/5</span>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--foreground)' }}>Voice Vocab Practice</span>
+                    <span style={{ fontSize: '0.85rem', color: 'var(--muted-foreground)', fontWeight: 600 }}>0/5</span>
                   </div>
-                  <div style={{ width: '100%', height: '6px', backgroundColor: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ width: '100%', height: '6px', backgroundColor: 'var(--border)', borderRadius: '3px', overflow: 'hidden' }}>
                     <div style={{ width: '20%', height: '100%', backgroundColor: '#3b82f6' }}></div>
                   </div>
                 </div>

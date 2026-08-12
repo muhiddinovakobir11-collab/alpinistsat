@@ -13,7 +13,7 @@ export default function Sidebar() {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <aside id="student-sidebar" className={styles.sidebar} style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto', backgroundColor: '#fff', borderRight: '1px solid #e2e8f0' }}>
+    <aside id="student-sidebar" className={styles.sidebar} style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
       <div className={styles.logo} style={{ padding: '1.5rem', fontSize: '1.25rem', fontStyle: 'italic', fontWeight: 900 }}>
         ALPINIST SAT
       </div>
@@ -55,21 +55,21 @@ export default function Sidebar() {
         </Link>
 
         {/* Daily Streak Widget with Animated Border */}
-        <div className="animated-border" style={{ marginTop: '2rem', padding: '1rem', color: '#0f172a' }}>
+        <div className="animated-border" style={{ marginTop: '2rem', padding: '1rem', color: 'var(--foreground)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 700 }}>
               <Flame size={16} strokeWidth={2.5} /> Daily Streak
             </div>
-            <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>ACTIVE</span>
+            <span style={{ fontSize: '0.7rem', color: 'var(--muted-foreground)', fontWeight: 600 }}>ACTIVE</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.5rem' }}>
             <span style={{ fontWeight: 600 }}>1 days</span>
-            <span style={{ color: '#64748b' }}>→ 3</span>
+            <span style={{ color: 'var(--muted-foreground)' }}>→ 3</span>
           </div>
-          <div style={{ height: '8px', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden', marginBottom: '0.75rem' }}>
-            <div style={{ width: '33%', height: '100%', backgroundColor: '#0f172a', borderRadius: '4px' }}></div>
+          <div style={{ height: '8px', backgroundColor: 'var(--border)', borderRadius: '4px', overflow: 'hidden', marginBottom: '0.75rem' }}>
+            <div style={{ width: '33%', height: '100%', backgroundColor: 'var(--foreground)', borderRadius: '4px' }}></div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#475569', fontWeight: 500 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--muted-foreground)', fontWeight: 500 }}>
             <span>Active today ✓</span>
             <span>2 to go</span>
           </div>
@@ -79,7 +79,7 @@ export default function Sidebar() {
         {!isPro && (
           <Link href="/dashboard/checkout" style={{ display: 'block', textDecoration: 'none', marginTop: '1rem' }}>
             <div className="animated-border" style={{ padding: '2px', cursor: 'pointer' }}>
-              <div style={{ backgroundColor: '#0f172a', padding: '10px', borderRadius: '8px', textAlign: 'center', color: '#fff', fontWeight: 700, fontSize: '0.9rem' }}>
+              <div style={{ backgroundColor: 'var(--primary)', padding: '10px', borderRadius: '8px', textAlign: 'center', color: 'var(--primary-foreground)', fontWeight: 700, fontSize: '0.9rem' }}>
                 Upgrade to Pro
               </div>
             </div>
