@@ -1,7 +1,6 @@
 import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import styles from "./layout.module.css";
 import AIChatWidget from "@/components/AIChatWidget";
