@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       systemPrompt += `\n\nContext about the student: The student recently scored a ${testContext.totalScore} on their mock test (${testContext.readingScore} Reading, ${testContext.mathScore} Math). Tailor your advice considering these strengths/weaknesses.`;
     }
 
-    const messages = [
+    const messages: any[] = [
       { role: "system", content: systemPrompt }
     ];
 
