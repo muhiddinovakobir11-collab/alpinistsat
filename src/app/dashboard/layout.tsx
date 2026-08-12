@@ -1,6 +1,7 @@
 import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import styles from "./layout.module.css";
 import AIChatWidget from "@/components/AIChatWidget";
@@ -19,6 +20,26 @@ export default async function DashboardLayout({
 
   return (
     <div className={styles.dashboardContainer} style={{ position: 'relative' }}>
+      {/* Ambient Animated Background */}
+      <div className="ambient-bg"></div>
+
+      {/* Marquee Ticker */}
+      <div className="marquee-container">
+        <div className="marquee-content">
+          <div className="marquee-item">🏆 Rustam G. - 1520 ball</div>
+          <div className="marquee-item">🚀 Malika B. - 1480 ball</div>
+          <div className="marquee-item">🔥 Jasur T. - 10 kunlik streak</div>
+          <div className="marquee-item">⭐ Alisher K. - Math 800</div>
+          <div className="marquee-item">💡 Sevara A. - 1550 ball</div>
+          {/* Duplicate for infinite loop effect */}
+          <div className="marquee-item">🏆 Rustam G. - 1520 ball</div>
+          <div className="marquee-item">🚀 Malika B. - 1480 ball</div>
+          <div className="marquee-item">🔥 Jasur T. - 10 kunlik streak</div>
+          <div className="marquee-item">⭐ Alisher K. - Math 800</div>
+          <div className="marquee-item">💡 Sevara A. - 1550 ball</div>
+        </div>
+      </div>
+
       <Sidebar />
       <div className={styles.mainContent}>
         <div className="mobile-hide" style={{ display: 'none' }} id="mobile-menu-placeholder"></div>

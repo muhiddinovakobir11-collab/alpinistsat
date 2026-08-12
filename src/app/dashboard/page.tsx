@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { BookOpen, Calendar, Target, CheckCircle2, TrendingUp, Zap, Bell, Flame, Medal, Volume2, Save, X, Moon, Sun, Quote } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { BookOpen, Calendar, Target, CheckCircle2, TrendingUp, Zap, Bell, Flame, Medal, Volume2, Save, X, Moon, Sun, Quote, Play, Pause, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import confetti from 'canvas-confetti';
 import styles from './page.module.css';
@@ -11,6 +11,35 @@ export default function DashboardPage() {
   const [isEditingTarget, setIsEditingTarget] = useState(false);
   const [tempScore, setTempScore] = useState(1500);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isTimerRunning && timeLeft > 0) {
+      interval = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+    } else if (timeLeft === 0) {
+      setIsTimerRunning(false);
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    }
+    return () => clearInterval(interval);
+  }, [isTimerRunning, timeLeft]);
+
+  const toggleTimer = () => {
+    setIsTimerRunning(!isTimerRunning);
+    playTone(isTimerRunning ? 300 : 600, 'triangle', 100);
+  };
+  const resetTimer = () => { 
+    setIsTimerRunning(false); 
+    setTimeLeft(25 * 60); 
+    playTone(200, 'triangle', 150);
+  };
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -21,9 +50,32 @@ export default function DashboardPage() {
     }
   };
 
+  const playTone = (freq: number, type: 'sine' | 'triangle' = 'sine', duration: number = 150) => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      oscillator.type = type;
+      oscillator.frequency.value = freq;
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration / 1000);
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + duration / 1000);
+    } catch (e) {}
+  };
+
+  const playSuccess = () => {
+    playTone(440, 'sine', 150);
+    setTimeout(() => playTone(554, 'sine', 150), 100);
+    setTimeout(() => playTone(659, 'sine', 300), 200);
+  };
+
   const handleSaveTarget = () => {
     if (tempScore >= 400 && tempScore <= 1600) {
       setTargetScore(tempScore);
+      playSuccess();
       confetti({
         particleCount: 150,
         spread: 70,
@@ -226,6 +278,70 @@ export default function DashboardPage() {
             <p style={{ fontSize: '0.875rem', opacity: 0.8, textAlign: 'right', fontWeight: 500 }}>
               — Robert Collier
             </p>
+          </div>
+
+          {/* New Feature: Gamification Badges */}
+          <div className="card tilt-card stagger-3" style={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', padding: '1.5rem', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+              <Medal size={20} color="#f59e0b" /> Yutuqlar & Nishonlar
+            </h2>
+            <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', marginTop: '1.5rem' }}>
+              <div className="hover-scale pulse-anim" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => playTone(800, 'sine', 100)}>
+                <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'linear-gradient(135deg, #f59e0b, #fbbf24)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(245, 158, 11, 0.4)' }}>
+                  <Flame size={32} color="#fff" />
+                </div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>5 Kunlik</span>
+              </div>
+              
+              <div className="hover-scale" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', opacity: 0.5 }}>
+                <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed var(--border)' }}>
+                  <Target size={32} color="var(--muted-foreground)" />
+                </div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted-foreground)' }}>1500+ Ball</span>
+              </div>
+
+              <div className="hover-scale" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', opacity: 0.5 }}>
+                <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed var(--border)' }}>
+                  <BookOpen size={32} color="var(--muted-foreground)" />
+                </div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted-foreground)' }}>Kitobxon</span>
+              </div>
+            </div>
+          </div>
+
+          {/* New Feature: Pomodoro Timer */}
+          <div className="card tilt-card glow-border" style={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', padding: '1.5rem', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+              <Zap size={20} color="#f59e0b" /> Focus Timer
+            </h2>
+            <div style={{ 
+              width: '150px', height: '150px', 
+              borderRadius: '50%', 
+              border: `8px solid ${isTimerRunning ? '#10b981' : 'var(--muted)'}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 1.5rem auto',
+              fontSize: '2.5rem', fontWeight: 800, color: 'var(--foreground)',
+              transition: 'border-color 0.3s ease',
+              position: 'relative'
+            }}>
+              {formatTime(timeLeft)}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+              <button 
+                onClick={toggleTimer} 
+                className="hover-scale"
+                style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: isTimerRunning ? '#ef4444' : '#10b981', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none' }}
+              >
+                {isTimerRunning ? <Pause size={24} /> : <Play size={24} style={{ marginLeft: '4px' }} />}
+              </button>
+              <button 
+                onClick={resetTimer} 
+                className="hover-scale"
+                style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: 'var(--muted)', color: 'var(--foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none' }}
+              >
+                <RotateCcw size={24} />
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -3,10 +3,27 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, User, ImagePlus } from 'lucide-react';
 
+const TypewriterText = ({ text, isNew }: { text: string, isNew: boolean }) => {
+  const [displayedText, setDisplayedText] = useState(isNew ? '' : text);
+  
+  useEffect(() => {
+    if (!isNew) return;
+    let index = 0;
+    const interval = setInterval(() => {
+      setDisplayedText(text.slice(0, index + 1));
+      index++;
+      if (index >= text.length) clearInterval(interval);
+    }, 15);
+    return () => clearInterval(interval);
+  }, [text, isNew]);
+
+  return <span>{displayedText}</span>;
+};
+
 export default function AIChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<{role: 'ai' | 'user', text: string, image?: string}[]>([
-    { role: 'ai', text: "Hi! I'm your Alpinist AI Tutor powered by Gemini. Ask me any SAT-related questions or upload an image of a question!" }
+  const [messages, setMessages] = useState<{role: 'ai' | 'user', text: string, image?: string, isNew?: boolean}[]>([
+    { role: 'ai', text: "Hi! I'm your Alpinist AI Tutor powered by Gemini. Ask me any SAT-related questions or upload an image of a question!", isNew: false }
   ]);
   const [input, setInput] = useState('');
   const [imageFile, setImageFile] = useState<string | null>(null);
@@ -60,9 +77,9 @@ export default function AIChatWidget() {
         body: JSON.stringify({ message: userMessage, imageBase64: currentImage, testContext })
       });
       const data = await res.json();
-      setMessages(prev => [...prev, { role: 'ai', text: data.reply }]);
+      setMessages(prev => [...prev, { role: 'ai', text: data.reply, isNew: true }]);
     } catch (err) {
-      setMessages(prev => [...prev, { role: 'ai', text: "Error connecting to AI." }]);
+      setMessages(prev => [...prev, { role: 'ai', text: "Error connecting to AI.", isNew: true }]);
     } finally {
       setIsLoading(false);
     }
@@ -103,14 +120,14 @@ export default function AIChatWidget() {
           right: '2rem',
           width: '350px',
           height: '500px',
-          backgroundColor: '#fff',
+          backgroundColor: 'var(--card)',
           borderRadius: '16px',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
           zIndex: 9999,
-          border: '1px solid #e2e8f0'
+          border: '1px solid var(--border)'
         }}>
           {/* Header */}
           <div style={{ padding: '1rem', background: 'linear-gradient(135deg, #0f172a, #1e293b)', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -119,7 +136,7 @@ export default function AIChatWidget() {
           </div>
 
           {/* Messages */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem', backgroundColor: '#f8fafc' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem', backgroundColor: 'var(--background)' }}>
             {messages.map((m, i) => (
               <div key={i} style={{ 
                 alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
@@ -134,22 +151,22 @@ export default function AIChatWidget() {
                 <div style={{ 
                   padding: '0.75rem', 
                   borderRadius: '12px',
-                  backgroundColor: m.role === 'user' ? '#3b82f6' : '#fff',
-                  color: m.role === 'user' ? '#fff' : '#0f172a',
-                  border: m.role === 'user' ? 'none' : '1px solid #e2e8f0',
+                  backgroundColor: m.role === 'user' ? '#3b82f6' : 'var(--card)',
+                  color: m.role === 'user' ? '#fff' : 'var(--foreground)',
+                  border: m.role === 'user' ? 'none' : '1px solid var(--border)',
                   fontSize: '0.875rem',
                   lineHeight: 1.5,
                   boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
                 }}>
                   {m.image && <img src={m.image} alt="Upload" style={{ maxWidth: '100%', borderRadius: '8px', marginBottom: m.text ? '0.5rem' : '0' }} />}
-                  {m.text}
+                  {m.role === 'ai' ? <TypewriterText text={m.text} isNew={m.isNew || false} /> : m.text}
                 </div>
               </div>
             ))}
             {isLoading && (
               <div style={{ alignSelf: 'flex-start', display: 'flex', gap: '0.5rem' }}>
                 <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Bot size={16} color="#fff" /></div>
-                <div style={{ padding: '0.75rem', borderRadius: '12px', backgroundColor: '#fff', border: '1px solid #e2e8f0' }}>Thinking...</div>
+                <div style={{ padding: '0.75rem', borderRadius: '12px', backgroundColor: 'var(--card)', border: '1px solid var(--border)', color: 'var(--foreground)' }}>Thinking...</div>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -157,14 +174,14 @@ export default function AIChatWidget() {
 
           {/* Image Preview */}
           {imageFile && (
-            <div style={{ padding: '0.5rem 1rem', backgroundColor: '#f1f5f9', borderTop: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ padding: '0.5rem 1rem', backgroundColor: 'var(--muted)', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <img src={imageFile} alt="Preview" style={{ height: '40px', borderRadius: '4px' }} />
               <button onClick={() => setImageFile(null)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.75rem' }}><X size={16}/></button>
             </div>
           )}
 
           {/* Input */}
-          <div style={{ padding: '1rem', borderTop: '1px solid #e2e8f0', backgroundColor: '#fff', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <div style={{ padding: '1rem', borderTop: '1px solid var(--border)', backgroundColor: 'var(--card)', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <input 
               type="file" 
               accept="image/*" 
@@ -174,7 +191,7 @@ export default function AIChatWidget() {
             />
             <button 
               onClick={() => fileInputRef.current?.click()}
-              style={{ padding: '0.5rem', backgroundColor: '#f1f5f9', color: '#64748b', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
+              style={{ padding: '0.5rem', backgroundColor: 'var(--muted)', color: 'var(--muted-foreground)', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
             >
               <ImagePlus size={20} />
             </button>
@@ -184,7 +201,7 @@ export default function AIChatWidget() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
               placeholder="Ask a question..."
-              style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid #cbd5e1', outline: 'none' }}
+              style={{ flex: 1, padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border)', outline: 'none', backgroundColor: 'var(--background)', color: 'var(--foreground)' }}
             />
             <button 
               onClick={sendMessage}
