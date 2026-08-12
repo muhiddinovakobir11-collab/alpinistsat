@@ -1,27 +1,49 @@
 'use client';
 
 import React, { useState } from 'react';
-import { BookOpen, Calendar, Target, CheckCircle2, TrendingUp, Zap, Bell, Flame, Medal, Volume2, Save, X } from 'lucide-react';
+import { BookOpen, Calendar, Target, CheckCircle2, TrendingUp, Zap, Bell, Flame, Medal, Volume2, Save, X, Moon, Sun, Quote } from 'lucide-react';
 import Link from 'next/link';
+import confetti from 'canvas-confetti';
 import styles from './page.module.css';
 
 export default function DashboardPage() {
   const [targetScore, setTargetScore] = useState(1500);
   const [isEditingTarget, setIsEditingTarget] = useState(false);
   const [tempScore, setTempScore] = useState(1500);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    if (!isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
 
   const handleSaveTarget = () => {
     if (tempScore >= 400 && tempScore <= 1600) {
       setTargetScore(tempScore);
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#10b981', '#3b82f6', '#f59e0b']
+      });
     }
     setIsEditingTarget(false);
   };
 
   return (
     <div className="fade-in">
-      <div className={styles.dashboardHeader}>
-        <h1>Dashboard</h1>
-        <p>Welcome back, Student!</p>
+      <div className={styles.dashboardHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 className="stagger-1">Dashboard</h1>
+          <p className="stagger-2">Welcome back, Student!</p>
+        </div>
+        <button onClick={toggleDarkMode} className="stagger-1 hover-scale" style={{ padding: '0.75rem', borderRadius: '50%', backgroundColor: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {isDarkMode ? <Sun size={24} color="#f59e0b" /> : <Moon size={24} color="#0f172a" />}
+        </button>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
@@ -123,7 +145,7 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          <div className={`card ${styles.targetCard}`}>
+          <div className={`card ${styles.targetCard} tilt-card glow-border`}>
             <h2><Target size={24} /> Your Target Score</h2>
             <div style={{ marginTop: '2rem' }}>
               <p style={{ color: 'var(--muted-foreground)', marginBottom: '0.5rem' }}>Current Target</p>
@@ -140,20 +162,21 @@ export default function DashboardPage() {
                     style={{ 
                       fontSize: '2rem', 
                       fontWeight: 800, 
-                      color: '#0f172a', 
+                      color: 'var(--foreground)', 
                       width: '120px', 
                       padding: '0.5rem', 
                       borderRadius: '8px',
                       border: '2px solid #3b82f6',
-                      outline: 'none'
+                      outline: 'none',
+                      backgroundColor: 'var(--background)'
                     }} 
                   />
-                  <span style={{ color: '#64748b', fontWeight: 600 }}>/ 1600</span>
+                  <span style={{ color: 'var(--muted-foreground)', fontWeight: 600 }}>/ 1600</span>
                 </div>
               ) : (
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem', marginBottom: '1rem' }}>
-                  <span style={{ fontSize: '3rem', fontWeight: 800, color: '#0f172a' }}>{targetScore}</span>
-                  <span style={{ color: '#64748b', fontWeight: 600 }}>/ 1600</span>
+                  <span style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--success)' }}>{targetScore}</span>
+                  <span style={{ color: 'var(--muted-foreground)', fontWeight: 600 }}>/ 1600</span>
                 </div>
               )}
 
@@ -161,7 +184,7 @@ export default function DashboardPage() {
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button 
                     onClick={handleSaveTarget}
-                    className="btn btn-primary" 
+                    className="btn btn-primary hover-scale" 
                     style={{ padding: '0.75rem', flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}
                   >
                     <Save size={18} /> Save
@@ -171,8 +194,8 @@ export default function DashboardPage() {
                       setIsEditingTarget(false);
                       setTempScore(targetScore);
                     }}
-                    className="btn" 
-                    style={{ padding: '0.75rem', flex: 1, backgroundColor: '#f1f5f9', color: '#0f172a', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}
+                    className="btn hover-scale" 
+                    style={{ padding: '0.75rem', flex: 1, backgroundColor: 'var(--muted)', color: 'var(--foreground)', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}
                   >
                     <X size={18} /> Cancel
                   </button>
@@ -180,13 +203,29 @@ export default function DashboardPage() {
               ) : (
                 <button 
                   onClick={() => setIsEditingTarget(true)}
-                  className="btn btn-primary" 
+                  className="btn btn-primary hover-scale" 
                   style={{ padding: '0.75rem 2rem', width: '100%' }}
                 >
                   Change Target
                 </button>
               )}
             </div>
+          </div>
+
+          {/* New Feature: Quote of the Day */}
+          <div className="card tilt-card float-anim" style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', borderRadius: '16px', padding: '1.5rem', color: '#fff', boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.5)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+              <Quote size={24} color="rgba(255,255,255,0.7)" />
+              <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', backgroundColor: 'rgba(0,0,0,0.2)', padding: '4px 10px', borderRadius: '12px' }}>
+                Daily Motivation
+              </span>
+            </div>
+            <p style={{ fontSize: '1.125rem', fontWeight: 600, lineHeight: 1.5, marginBottom: '1rem', fontStyle: 'italic' }}>
+              "Success is the sum of small efforts, repeated day in and day out."
+            </p>
+            <p style={{ fontSize: '0.875rem', opacity: 0.8, textAlign: 'right', fontWeight: 500 }}>
+              — Robert Collier
+            </p>
           </div>
         </div>
       </div>

@@ -27,9 +27,14 @@ export default function CheckoutPage() {
         <CheckCircle2 size={64} color="#10b981" style={{ marginBottom: '1rem' }} />
         <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#0f172a' }}>You are already PRO!</h1>
         <p style={{ color: '#64748b', fontSize: '1.25rem', marginBottom: '2rem' }}>You have full access to all premium features.</p>
-        <Link href="/dashboard" className="btn btn-primary" style={{ padding: '1rem 3rem', borderRadius: '30px', fontSize: '1.125rem' }}>
-          Go to Dashboard
-        </Link>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <Link href="/dashboard" className="btn btn-primary" style={{ padding: '1rem 3rem', borderRadius: '30px', fontSize: '1.125rem' }}>
+            Go to Dashboard
+          </Link>
+          <button onClick={() => window.print()} style={{ padding: '1rem 2rem', borderRadius: '30px', fontSize: '1.125rem', backgroundColor: '#f1f5f9', color: '#0f172a', border: '1px solid #cbd5e1', cursor: 'pointer', fontWeight: 600 }}>
+            Download Receipt (PDF)
+          </button>
+        </div>
       </div>
     );
   }
@@ -113,8 +118,8 @@ export default function CheckoutPage() {
               marginTop: '2rem'
             }}
           >
-            {loading ? 'Processing...' : (
-              <>Pay $29.00 <ArrowRight size={20} /></>
+            {loading ? <span>Processing...</span> : (
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><span>Pay $29.00</span> <ArrowRight size={20} /></span>
             )}
           </button>
         </div>

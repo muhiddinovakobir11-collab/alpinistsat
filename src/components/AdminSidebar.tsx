@@ -72,10 +72,17 @@ export default function AdminSidebar() {
           <Settings className={styles.navIcon} size={18} />
           <span style={{ fontSize: '0.875rem' }}>Admin Settings</span>
         </Link>
-        <Link href="/dashboard" className={styles.navItem} style={{ color: '#ef4444' }}>
+        <button 
+          onClick={() => {
+            localStorage.removeItem('alpinist_admin_auth');
+            window.location.href = '/dashboard';
+          }} 
+          className={styles.navItem} 
+          style={{ color: '#ef4444', background: 'transparent', border: 'none', width: '100%', textAlign: 'left', cursor: 'pointer', padding: '0.75rem 1rem' }}
+        >
           <LogOut className={styles.navIcon} size={18} />
-          <span style={{ fontSize: '0.875rem' }}>Exit to App</span>
-        </Link>
+          <span style={{ fontSize: '0.875rem' }}>Admin Panelidan Chiqish</span>
+        </button>
       </div>
     </aside>
   );
