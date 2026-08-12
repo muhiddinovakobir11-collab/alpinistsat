@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash-lite" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     let prompt = `You are an expert SAT tutor for the 'Alpinist SAT' platform. Keep your response concise, helpful, and directly related to the SAT. You MUST communicate with the student in the Uzbek language (O'zbek tilida).`;
     
@@ -43,8 +43,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ reply: text });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Gemini API Error:', error);
-    return NextResponse.json({ reply: "Sorry, I am having trouble connecting to my brain right now." }, { status: 500 });
+    return NextResponse.json({ reply: `Sorry, I am having trouble connecting to my brain right now. Error: ${error.message || 'Unknown'}` }, { status: 500 });
   }
 }
