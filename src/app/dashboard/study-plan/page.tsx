@@ -59,7 +59,9 @@ export default function StudyPlanPage() {
               <div>
                 <h4 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.25rem' }}>Heart of Algebra (Math)</h4>
                 <p style={{ color: '#64748b', fontSize: '0.875rem', marginBottom: '1rem' }}>Based on your last mock test, you need to improve on linear equations.</p>
-                <button style={{ backgroundColor: '#0f172a', color: '#fff', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>Start 20 Questions</button>
+                <Link href="/dashboard/practice" style={{ textDecoration: 'none' }}>
+                  <button className="hover-scale" style={{ backgroundColor: '#0f172a', color: '#fff', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>Start 20 Questions</button>
+                </Link>
               </div>
             </div>
 
@@ -68,7 +70,9 @@ export default function StudyPlanPage() {
               <div>
                 <h4 style={{ fontSize: '1.125rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.25rem' }}>Words in Context (Reading)</h4>
                 <p style={{ color: '#64748b', fontSize: '0.875rem', marginBottom: '1rem' }}>Review high-frequency vocabulary for 15 minutes.</p>
-                <button style={{ backgroundColor: '#0f172a', color: '#fff', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>Open Vocab Trainer</button>
+                <Link href="/dashboard/vocabulary" style={{ textDecoration: 'none' }}>
+                  <button className="hover-scale" style={{ backgroundColor: '#0f172a', color: '#fff', border: 'none', padding: '0.5rem 1.5rem', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>Open Vocab Trainer</button>
+                </Link>
               </div>
             </div>
 
