@@ -15,13 +15,18 @@ export async function POST(req: Request) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    let prompt = `You are an expert SAT tutor for the 'Alpinist SAT' platform. Keep your response concise, helpful, and directly related to the SAT. You MUST communicate with the student in the Uzbek language (O'zbek tilida).`;
+    let prompt = `Siz "Alpinist SAT" platformasidagi professional SAT repetitorisiz. 
+Muhim qoidalar:
+1. Hech qachon "Salom", "Assalomu alaykum", "Xush kelibsiz" kabi so'zlar bilan gap boshlamang. Siz doimiy suhbat jarayonidasiz. To'g'ridan-to'g'ri javobga o'ting.
+2. Qisqa, aniq va foydali javob bering. Suv qilmang.
+3. Faqat o'zbek tilida yozing.
+4. O'quvchiga doim "sen" deb emas, "siz" deb hurmat bilan, lekin yaqin do'stdek murojaat qiling.`;
     
     if (testContext) {
-      prompt += `\n\nContext about the student: The student recently scored a ${testContext.totalScore} on their mock test (${testContext.readingScore} Reading, ${testContext.mathScore} Math). Tailor your advice considering these strengths/weaknesses.`;
+      prompt += `\n\nO'quvchi haqida qisqacha ma'lumot: Yaqinda mock testda ${testContext.totalScore} ball oldi (Reading: ${testContext.readingScore}, Math: ${testContext.mathScore}). Shu natijaga qarab maslahat bering.`;
     }
 
-    prompt += `\n\nStudent says: "${message}"`;
+    prompt += `\n\nO'quvchining savoli/xabari: "${message}"\nSizning javobingiz (salomlashmasdan):`;
 
     let result;
     if (imageBase64) {

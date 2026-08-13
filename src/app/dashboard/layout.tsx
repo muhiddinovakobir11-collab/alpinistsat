@@ -6,6 +6,7 @@ import styles from "./layout.module.css";
 import ClientEffects from "@/components/ClientEffects";
 import AIChatWidget from "@/components/AIChatWidget";
 import MobileMenuToggle from "@/components/MobileMenuToggle";
+import StudyLock from "@/components/StudyLock";
 
 export default async function DashboardLayout({
   children,
@@ -55,6 +56,7 @@ export default async function DashboardLayout({
         </header>
         <main className={styles.pageContainer}>{children}</main>
         <AIChatWidget />
+        <StudyLock />
       </div>
     </div>
   );
