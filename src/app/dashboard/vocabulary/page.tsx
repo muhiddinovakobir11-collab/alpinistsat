@@ -1,16 +1,15 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { BookOpen, Trophy, Settings, Eye, Search, BookDashed, Volume2, Mic, MicOff } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { BookOpen, Trophy, RotateCcw, Check, X, RefreshCw, Volume2 } from 'lucide-react';
+import styles from './vocab.module.css'; // We will create this CSS file next
 
 export default function VocabularyPage() {
   const [words, setWords] = useState<any[]>([]);
-  const [isListening, setIsListening] = useState(false);
-  const [activeWordId, setActiveWordId] = useState<number | null>(null);
-  const [recognizedText, setRecognizedText] = useState('');
-  
-  // Use explicit typing for the mock speech recognition
-  const recognitionRef = useRef<any>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
+  const [knownWords, setKnownWords] = useState<number[]>([]);
+  const [unknownWords, setUnknownWords] = useState<number[]>([]);
 
   useEffect(() => {
     import('@/data/vocabulary.json').then((data) => {
@@ -20,168 +19,139 @@ export default function VocabularyPage() {
     });
   }, []);
 
-  useEffect(() => {
-    // Only initialize SpeechRecognition if it exists in the browser
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
-
-      recognition.onresult = (event: any) => {
-        const text = event.results[0][0].transcript.toLowerCase();
-        setRecognizedText(text);
-        setIsListening(false);
-        
-        if (activeWordId !== null) {
-          const activeWord = words.find(w => w.id === activeWordId);
-          if (activeWord && text.includes(activeWord.word.toLowerCase())) {
-            alert(`Great pronunciation! You correctly said: "${activeWord.word}"`);
-          } else {
-            alert(`You said: "${text}". Try again to say "${activeWord?.word}" clearly.`);
-          }
-        }
-        setActiveWordId(null);
-      };
-
-      recognition.onerror = (event: any) => {
-        console.error('Speech recognition error', event.error);
-        setIsListening(false);
-        setActiveWordId(null);
-      };
-
-      recognition.onend = () => {
-        setIsListening(false);
-      };
-
-      recognitionRef.current = recognition;
-    }
-  }, [activeWordId, words]);
-
-  const toggleListening = (wordId: number) => {
-    if (isListening && activeWordId === wordId) {
-      recognitionRef.current?.stop();
-      setIsListening(false);
-      setActiveWordId(null);
-    } else {
-      if (isListening) recognitionRef.current?.stop();
-      setActiveWordId(wordId);
-      setRecognizedText('');
-      recognitionRef.current?.start();
-      setIsListening(true);
-    }
-  };
-
-  const playTTS = (text: string) => {
+  const playTTS = (text: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
     window.speechSynthesis.speak(utterance);
   };
 
+  const handleNext = (status: 'known' | 'unknown') => {
+    const wordId = words[currentIndex].id;
+    if (status === 'known') {
+      setKnownWords(prev => [...prev, wordId]);
+    } else {
+      setUnknownWords(prev => [...prev, wordId]);
+    }
+    
+    setIsFlipped(false);
+    setTimeout(() => {
+      setCurrentIndex(prev => prev + 1);
+    }, 150);
+  };
+
+  const resetDeck = () => {
+    setCurrentIndex(0);
+    setKnownWords([]);
+    setUnknownWords([]);
+    setIsFlipped(false);
+  };
+
+  if (words.length === 0) {
+    return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading words...</div>;
+  }
+
+  const isComplete = currentIndex >= words.length;
+
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '2rem 1rem' }}>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
       
       {/* Header */}
-      <div style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-          <BookOpen size={28} color="#0f172a" />
-          <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>Vocabulary</h1>
+      <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+          <BookOpen size={28} color="#3b82f6" />
+          <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>Smart Flashcards</h1>
         </div>
-        <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Build your vocabulary with personal words and teacher assignments</p>
+        <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Master SAT Vocabulary with Spaced Repetition</p>
       </div>
 
-      {/* Offered by Admins */}
-      <div className="fade-in card" style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '1.5rem', overflow: 'hidden' }}>
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <Trophy size={18} color="#64748b" />
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a' }}>Offered by Admins</h2>
-          <span style={{ fontSize: '0.75rem', backgroundColor: '#f1f5f9', color: '#64748b', padding: '2px 8px', borderRadius: '12px', fontWeight: 600 }}>{words.length} words</span>
+      {isComplete ? (
+        <div className="fade-in card" style={{ textAlign: 'center', padding: '4rem 2rem', backgroundColor: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+          <Trophy size={64} color="#f59e0b" style={{ margin: '0 auto 1.5rem' }} />
+          <h2 style={{ fontSize: '1.875rem', fontWeight: 800, color: '#0f172a', marginBottom: '1rem' }}>Deck Completed!</h2>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '2rem' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#10b981' }}>{knownWords.length}</div>
+              <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 600 }}>Mastered</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#ef4444' }}>{unknownWords.length}</div>
+              <div style={{ color: '#64748b', fontSize: '0.875rem', fontWeight: 600 }}>Needs Review</div>
+            </div>
+          </div>
+          <button 
+            onClick={resetDeck}
+            className="hover-scale"
+            style={{ padding: '12px 32px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+          >
+            <RefreshCw size={18} /> Review Again
+          </button>
         </div>
-        
-        {words.length > 0 ? (
-          <div style={{ padding: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            {words.slice().reverse().map((w, i) => (
-              <div key={i} className="hover-scale" style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', backgroundColor: activeWordId === w.id ? '#f0fdf4' : '#fff', transition: 'all 0.3s' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 800, fontSize: '1.125rem', color: '#2563eb' }}>{w.word}</span>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button 
-                      onClick={() => toggleListening(w.id)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '50%', backgroundColor: isListening && activeWordId === w.id ? '#fecaca' : '#f1f5f9' }}
-                      title="Practice Pronunciation"
-                    >
-                      {isListening && activeWordId === w.id ? <MicOff size={16} color="#ef4444" className="pulse-anim" /> : <Mic size={16} color="#64748b" />}
-                    </button>
-                    <button 
-                      onClick={() => playTTS(w.word)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '50%', backgroundColor: '#f1f5f9' }}
-                      title="Listen"
-                    >
-                      <Volume2 size={16} color="#3b82f6" />
-                    </button>
-                  </div>
+      ) : (
+        <>
+          {/* Progress Bar */}
+          <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#64748b' }}>{currentIndex + 1} / {words.length}</div>
+            <div style={{ flex: 1, height: '8px', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+              <div style={{ width: `${((currentIndex) / words.length) * 100}%`, height: '100%', backgroundColor: '#3b82f6', transition: 'width 0.3s ease' }}></div>
+            </div>
+          </div>
+
+          {/* Flashcard Container */}
+          <div className={styles.flashcardContainer} onClick={() => setIsFlipped(!isFlipped)}>
+            <div className={`${styles.flashcard} ${isFlipped ? styles.flipped : ''}`}>
+              
+              {/* Front (Word) */}
+              <div className={styles.front}>
+                <button 
+                  onClick={(e) => playTTS(words[currentIndex].word, e)}
+                  style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'none', border: 'none', cursor: 'pointer', padding: '8px', borderRadius: '50%', backgroundColor: '#f1f5f9' }}
+                >
+                  <Volume2 size={24} color="#3b82f6" />
+                </button>
+                <div style={{ fontSize: '3rem', fontWeight: 800, color: '#0f172a' }}>
+                  {words[currentIndex].word}
                 </div>
-                <div style={{ fontSize: '0.9rem', color: '#0f172a', fontWeight: 500 }}>{w.definition}</div>
-                <div style={{ fontSize: '0.85rem', color: '#64748b', fontStyle: 'italic' }}>"{w.example}"</div>
-                {activeWordId === w.id && isListening && (
-                  <div style={{ fontSize: '0.75rem', color: '#16a34a', fontWeight: 600, marginTop: '0.5rem' }}>Listening for "{w.word}"...</div>
-                )}
+                <div style={{ position: 'absolute', bottom: '1.5rem', color: '#94a3b8', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <RotateCcw size={16} /> Click to flip
+                </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div style={{ padding: '1.5rem' }}>
-            <div style={{ border: '1px dashed #cbd5e1', borderRadius: '8px', padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
-              No words offered yet.
+
+              {/* Back (Definition) */}
+              <div className={styles.back}>
+                <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', marginBottom: '1.5rem', textAlign: 'center' }}>
+                  {words[currentIndex].definition}
+                </div>
+                <div style={{ fontSize: '1.125rem', color: '#475569', fontStyle: 'italic', textAlign: 'center', padding: '0 1rem', borderLeft: '4px solid #3b82f6', backgroundColor: '#f8fafc', paddingBlock: '1rem', borderRadius: '4px' }}>
+                  "{words[currentIndex].example}"
+                </div>
+              </div>
+
             </div>
           </div>
-        )}
-      </div>
 
-      <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.875rem', fontWeight: 600, margin: '2rem 0' }}>
-        <span style={{ borderBottom: '2px solid #e2e8f0', display: 'inline-block', width: '40%' }}></span>
-        <span style={{ margin: '0 1rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}><BookOpen size={16}/> My Vocabulary (0)</span>
-        <span style={{ borderBottom: '2px solid #e2e8f0', display: 'inline-block', width: '40%' }}></span>
-      </div>
-
-      {/* Settings */}
-      <div className="card" style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '1.5rem' }}>
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <Settings size={18} color="#64748b" />
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, color: '#0f172a' }}>Settings</h2>
-        </div>
-        <div style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.25rem' }}>
-              <Eye size={18} /> Quick Add Widget
-            </div>
-            <div style={{ fontSize: '0.875rem', color: '#64748b' }}>Show a floating button to quickly add words from any page.</div>
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '2rem', opacity: isFlipped ? 1 : 0.5, pointerEvents: isFlipped ? 'auto' : 'none', transition: 'opacity 0.3s' }}>
+            <button 
+              onClick={() => handleNext('unknown')}
+              style={{ flex: 1, maxWidth: '200px', padding: '16px', backgroundColor: '#fef2f2', color: '#ef4444', border: '2px solid #fecaca', borderRadius: '12px', fontWeight: 700, fontSize: '1.125rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+              onMouseOver={e => e.currentTarget.style.backgroundColor = '#fee2e2'}
+              onMouseOut={e => e.currentTarget.style.backgroundColor = '#fef2f2'}
+            >
+              <X size={24} /> Needs Review
+            </button>
+            
+            <button 
+              onClick={() => handleNext('known')}
+              style={{ flex: 1, maxWidth: '200px', padding: '16px', backgroundColor: '#ecfdf5', color: '#10b981', border: '2px solid #a7f3d0', borderRadius: '12px', fontWeight: 700, fontSize: '1.125rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+              onMouseOver={e => e.currentTarget.style.backgroundColor = '#d1fae5'}
+              onMouseOut={e => e.currentTarget.style.backgroundColor = '#ecfdf5'}
+            >
+              <Check size={24} /> Got It!
+            </button>
           </div>
-          <div style={{ width: '44px', height: '24px', backgroundColor: '#0f172a', borderRadius: '12px', position: 'relative', cursor: 'pointer' }}>
-            <div style={{ width: '20px', height: '20px', backgroundColor: '#fff', borderRadius: '50%', position: 'absolute', right: '2px', top: '2px' }}></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Search & Empty State */}
-      <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
-        <Search size={18} color="#94a3b8" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
-        <input 
-          type="text" 
-          placeholder="Search your vocabulary..." 
-          style={{ width: '100%', padding: '1rem 1rem 1rem 3rem', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '0.95rem', outline: 'none' }} 
-        />
-      </div>
-
-      <div className="card" style={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '4rem 2rem', textAlign: 'center' }}>
-        <BookDashed size={48} color="#cbd5e1" style={{ margin: '0 auto 1rem' }} />
-        <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.5rem' }}>Your Vocabulary is Empty</h3>
-        <p style={{ color: '#64748b', fontSize: '0.95rem', marginBottom: '1.5rem' }}>Start by adding words using the Quick Add widget.</p>
-        <button className="hover-scale" style={{ padding: '10px 24px', backgroundColor: '#64748b', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '0.95rem', cursor: 'pointer' }}>
-          Enable Quick Add Widget
-        </button>
-      </div>
+        </>
+      )}
 
     </div>
   );

@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Calendar, Target, CheckCircle2, TrendingUp, Zap, Bell, Flame, Medal, Volume2, Save, X, Moon, Sun, Quote, Play, Pause, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import confetti from 'canvas-confetti';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { Trophy, Clock, ChevronUp } from 'lucide-react';
 import styles from './page.module.css';
 
 export default function DashboardPage() {
@@ -86,6 +87,17 @@ export default function DashboardPage() {
     setIsEditingTarget(false);
   };
 
+  const performanceData = [
+    { date: 'Aug 1', score: 1150 },
+    { date: 'Aug 5', score: 1210 },
+    { date: 'Aug 10', score: 1280 },
+    { date: 'Aug 15', score: 1350 },
+    { date: 'Aug 20', score: 1420 },
+    { date: 'Aug 25', score: 1490 },
+  ];
+
+  const dailyProgress = 75; // 75% complete
+
   return (
     <div className="fade-in">
       <div className={styles.dashboardHeader} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -147,11 +159,101 @@ export default function DashboardPage() {
               </Link>
             </div>
           </div>
+
+          {/* Performance Analytics Line Chart */}
+          <div className="card tilt-card" style={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', padding: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+              <TrendingUp size={24} color="#3b82f6" />
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--foreground)' }}>Performance Analytics</h2>
+            </div>
+            <div style={{ width: '100%', height: '300px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={performanceData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                  <Line type="monotone" dataKey="score" stroke="#3b82f6" strokeWidth={4} dot={{ r: 6, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 8 }} />
+                  <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="date" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis domain={[1000, 1600]} tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <RechartsTooltip 
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+                    itemStyle={{ color: '#0f172a', fontWeight: 800 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Leaderboard (Reyting) */}
+          <div className="card" style={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', padding: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <Trophy size={24} color="#f59e0b" />
+                <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--foreground)' }}>Global Leaderboard</h2>
+              </div>
+              <span style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)', fontWeight: 600 }}>Top 5</span>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {[
+                { rank: 1, name: 'Alex Johnson', score: 1590, change: 'up' },
+                { rank: 2, name: 'Sarah Chen', score: 1580, change: 'up' },
+                { rank: 3, name: 'You (Student)', score: 1500, change: 'same', isYou: true },
+                { rank: 4, name: 'Michael T.', score: 1490, change: 'down' },
+                { rank: 5, name: 'David Kim', score: 1470, change: 'up' },
+              ].map((user, idx) => (
+                <div key={idx} className="hover-scale" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', backgroundColor: user.isYou ? '#f0f9ff' : '#f8fafc', borderRadius: '12px', border: user.isYou ? '2px solid #3b82f6' : '1px solid transparent' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: idx === 0 ? '#fef3c7' : idx === 1 ? '#f1f5f9' : idx === 2 ? '#ffedd5' : '#e2e8f0', color: idx === 0 ? '#d97706' : idx === 1 ? '#64748b' : idx === 2 ? '#c2410c' : '#475569', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.875rem' }}>
+                      {user.rank}
+                    </div>
+                    <span style={{ fontWeight: user.isYou ? 800 : 600, color: 'var(--foreground)' }}>{user.name}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <span style={{ fontWeight: 800, color: 'var(--foreground)' }}>{user.score}</span>
+                    {user.change === 'up' && <ChevronUp size={16} color="#10b981" />}
+                    {user.change === 'down' && <ChevronUp size={16} color="#ef4444" style={{ transform: 'rotate(180deg)' }} />}
+                    {user.change === 'same' && <div style={{ width: '16px', height: '4px', backgroundColor: '#94a3b8', borderRadius: '2px' }}></div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Sidebar Widgets */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
           
+          {/* Daily Goal Progress Ring */}
+          <div className="card tilt-card" style={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', padding: '1.5rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--foreground)', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+              <Target size={20} color="#10b981" /> Daily Goal
+            </h2>
+            
+            <div style={{ position: 'relative', width: '160px', height: '160px', margin: '0 auto' }}>
+              <svg width="160" height="160" viewBox="0 0 160 160" style={{ transform: 'rotate(-90deg)' }}>
+                {/* Background Track */}
+                <circle cx="80" cy="80" r="70" fill="none" stroke="var(--muted)" strokeWidth="12" />
+                {/* Progress Ring */}
+                <circle 
+                  cx="80" cy="80" r="70" 
+                  fill="none" 
+                  stroke="#10b981" 
+                  strokeWidth="12" 
+                  strokeLinecap="round"
+                  strokeDasharray={`${2 * Math.PI * 70}`}
+                  strokeDashoffset={`${2 * Math.PI * 70 * (1 - dailyProgress / 100)}`}
+                  style={{ transition: 'stroke-dashoffset 1.5s ease-in-out' }}
+                />
+              </svg>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--foreground)', lineHeight: 1 }}>{dailyProgress}%</span>
+                <span style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)', fontWeight: 600 }}>Completed</span>
+              </div>
+            </div>
+            <p style={{ marginTop: '1.5rem', fontSize: '0.9rem', color: '#64748b', fontWeight: 500 }}>
+              You're almost there! Complete 1 more task to hit your daily goal.
+            </p>
+          </div>
+
           {/* Daily Missions & Quests */}
           <div className="card tilt-card" style={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', padding: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
@@ -343,6 +445,41 @@ export default function DashboardPage() {
               </button>
             </div>
           </div>
+
+          {/* Custom Study Reminders */}
+          <div className="card tilt-card" style={{ backgroundColor: 'var(--card)', borderRadius: '16px', border: '1px solid var(--border)', padding: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Clock size={20} color="#8b5cf6" /> Study Reminders
+              </h2>
+              <button style={{ background: 'none', border: 'none', color: '#3b82f6', fontWeight: 700, cursor: 'pointer', fontSize: '0.875rem' }}>+ Add</button>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <div>
+                  <div style={{ fontWeight: 700, color: '#0f172a' }}>10 Mins Vocab</div>
+                  <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500 }}>Everyday at 8:00 AM</div>
+                </div>
+                {/* Custom Toggle Switch */}
+                <div style={{ width: '40px', height: '22px', backgroundColor: '#10b981', borderRadius: '11px', position: 'relative', cursor: 'pointer' }}>
+                  <div style={{ width: '18px', height: '18px', backgroundColor: '#fff', borderRadius: '50%', position: 'absolute', right: '2px', top: '2px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}></div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', opacity: 0.6 }}>
+                <div>
+                  <div style={{ fontWeight: 700, color: '#0f172a' }}>Full Mock Test</div>
+                  <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 500 }}>Saturdays at 10:00 AM</div>
+                </div>
+                {/* Custom Toggle Switch */}
+                <div style={{ width: '40px', height: '22px', backgroundColor: '#cbd5e1', borderRadius: '11px', position: 'relative', cursor: 'pointer' }}>
+                  <div style={{ width: '18px', height: '18px', backgroundColor: '#fff', borderRadius: '50%', position: 'absolute', left: '2px', top: '2px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

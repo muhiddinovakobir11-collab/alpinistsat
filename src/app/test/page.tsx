@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Clock, Calculator, PenTool, Save, Bookmark, Play, CheckCircle } from 'lucide-react';
+import { Clock, Calculator, PenTool, Save, Bookmark, Play, CheckCircle, AlignJustify, FileText, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Draggable from 'react-draggable';
 import styles from './test.module.css';
@@ -63,10 +63,14 @@ export default function TestPage() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [markedForReview, setMarkedForReview] = useState<string[]>([]);
   const [eliminatedOptions, setEliminatedOptions] = useState<Record<string, string[]>>({});
+  const [timeSpent, setTimeSpent] = useState<Record<string, number>>({});
   
   // UI State
   const [showCalc, setShowCalc] = useState(false);
+  const [showReference, setShowReference] = useState(false);
   const [isAnnotationMode, setIsAnnotationMode] = useState(false);
+  const [isLineReaderMode, setIsLineReaderMode] = useState(false);
+  const [lineReaderY, setLineReaderY] = useState(300);
 
   const calcRef = useRef(null);
   const passageRef = useRef<HTMLDivElement>(null);
@@ -83,6 +87,7 @@ export default function TestPage() {
         setAnswers(state.answers || {});
         setMarkedForReview(state.markedForReview || []);
         setEliminatedOptions(state.eliminatedOptions || {});
+        setTimeSpent(state.timeSpent || {});
       } catch (e) {
         console.error('Failed to load state', e);
       }
@@ -99,9 +104,14 @@ export default function TestPage() {
     }
     const timer = setInterval(() => {
       setTimeLeft((prev) => prev - 1);
+      
+      const currentQId = currentQuestions[currentIndex]?.id;
+      if (currentQId) {
+        setTimeSpent(prev => ({ ...prev, [currentQId]: (prev[currentQId] || 0) + 1 }));
+      }
     }, 1000);
     return () => clearInterval(timer);
-  }, [timeLeft, isPaused, currentPhase]);
+  }, [timeLeft, isPaused, currentPhase, currentQuestions, currentIndex]);
 
   // Handle Moving to Next Phase
   const handlePhaseEnd = () => {
@@ -139,7 +149,8 @@ export default function TestPage() {
       currentIndex,
       answers,
       markedForReview,
-      eliminatedOptions
+      eliminatedOptions,
+      timeSpent
     };
     localStorage.setItem('alpinist_test_state', JSON.stringify(state));
     router.push('/dashboard');
@@ -168,7 +179,8 @@ export default function TestPage() {
       correctReading,
       totalMath: m1.length + m2.length,
       correctMath,
-      answers
+      answers,
+      timeSpent
     }));
 
     router.push('/test/results');
@@ -191,9 +203,20 @@ export default function TestPage() {
         } catch (e) {}
       }
     };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isLineReaderMode) {
+        setLineReaderY(e.clientY);
+      }
+    };
+
     document.addEventListener('mouseup', handleMouseUp);
-    return () => document.removeEventListener('mouseup', handleMouseUp);
-  }, [isAnnotationMode]);
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [isAnnotationMode, isLineReaderMode]);
 
   // Keyboard Shortcuts (A, B, C, D)
   useEffect(() => {
@@ -302,30 +325,108 @@ export default function TestPage() {
 
         <div className={styles.headerTools}>
           {isMath && (
-            <button 
-              className={styles.toolBtn} 
-              onClick={() => setShowCalc(!showCalc)}
-              style={{ color: showCalc ? '#2563eb' : 'inherit' }}
-            >
-              <Calculator size={18} /> Calculator
-            </button>
+            <>
+              <button 
+                className={styles.toolBtn} 
+                onClick={() => setShowReference(!showReference)}
+                style={{ color: showReference ? '#2563eb' : 'inherit' }}
+              >
+                <FileText size={18} /> Reference
+              </button>
+              <button 
+                className={styles.toolBtn} 
+                onClick={() => setShowCalc(!showCalc)}
+                style={{ color: showCalc ? '#2563eb' : 'inherit' }}
+              >
+                <Calculator size={18} /> Calculator
+              </button>
+            </>
           )}
+          
           <button 
             className={styles.toolBtn} 
-            onClick={() => setIsAnnotationMode(!isAnnotationMode)}
+            onClick={() => {
+              setIsLineReaderMode(!isLineReaderMode);
+              setIsAnnotationMode(false);
+            }}
+            style={{ color: isLineReaderMode ? '#3b82f6' : 'inherit', backgroundColor: isLineReaderMode ? '#eff6ff' : 'transparent', padding: '4px 8px', borderRadius: '4px' }}
+          >
+            <AlignJustify size={18} /> Line Reader {isLineReaderMode && '(On)'}
+          </button>
+          
+          <button 
+            className={styles.toolBtn} 
+            onClick={() => {
+              setIsAnnotationMode(!isAnnotationMode);
+              setIsLineReaderMode(false);
+            }}
             style={{ color: isAnnotationMode ? '#eab308' : 'inherit', backgroundColor: isAnnotationMode ? '#fef08a' : 'transparent', padding: '4px 8px', borderRadius: '4px' }}
           >
-            <PenTool size={18} /> Annotation {isAnnotationMode && '(On)'}
+            <PenTool size={18} /> Annotate {isAnnotationMode && '(On)'}
           </button>
+          
           <button className={styles.toolBtn} onClick={saveAndExit}>
             <Save size={18} /> Save & Exit
           </button>
         </div>
       </header>
 
-      <main className={styles.mainArea}>
+      <main className={styles.mainArea} style={{ cursor: isLineReaderMode ? 'none' : 'default' }}>
+        
+        {/* Line Reader Overlay */}
+        {isLineReaderMode && (
+          <div style={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            top: `${lineReaderY - 25}px`,
+            height: '50px',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            borderTop: '2px solid #3b82f6',
+            borderBottom: '2px solid #3b82f6',
+            pointerEvents: 'none',
+            zIndex: 9999,
+            boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.4)'
+          }}></div>
+        )}
+
+        {/* Reference Sheet Modal */}
+        {showReference && isMath && (
+          <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: '#fff', padding: '2rem', borderRadius: '16px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)', zIndex: 10000, width: '90%', maxWidth: '800px', maxHeight: '80vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>Reference Sheet</h2>
+              <button onClick={() => setShowReference(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}><X size={24}/></button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+              <div>
+                <h3 style={{ fontWeight: 700, color: '#3b82f6', marginBottom: '0.5rem' }}>Area & Volume</h3>
+                <ul style={{ color: '#475569', lineHeight: 2 }}>
+                  <li><strong>Circle:</strong> A = πr², C = 2πr</li>
+                  <li><strong>Rectangle:</strong> A = lw</li>
+                  <li><strong>Triangle:</strong> A = ½bh</li>
+                  <li><strong>Cylinder Volume:</strong> V = πr²h</li>
+                  <li><strong>Sphere Volume:</strong> V = ⁴⁄₃πr³</li>
+                  <li><strong>Cone Volume:</strong> V = ⅓πr²h</li>
+                  <li><strong>Pyramid Volume:</strong> V = ⅓lwh</li>
+                </ul>
+              </div>
+              <div>
+                <h3 style={{ fontWeight: 700, color: '#3b82f6', marginBottom: '0.5rem' }}>Special Right Triangles</h3>
+                <ul style={{ color: '#475569', lineHeight: 2 }}>
+                  <li><strong>Pythagorean:</strong> a² + b² = c²</li>
+                  <li><strong>30°-60°-90°:</strong> x, x√3, 2x</li>
+                  <li><strong>45°-45°-90°:</strong> x, x, x√2</li>
+                  <li>The number of degrees of arc in a circle is 360.</li>
+                  <li>The number of radians of arc in a circle is 2π.</li>
+                  <li>The sum of the measures in degrees of the angles of a triangle is 180.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
         {currentQuestion.passage && (
-          <div className={styles.leftColumn} ref={passageRef} style={{ cursor: isAnnotationMode ? 'text' : 'default' }}>
+          <div className={styles.leftColumn} ref={passageRef} style={{ cursor: isAnnotationMode ? 'text' : isLineReaderMode ? 'none' : 'default' }}>
             {isAnnotationMode && <div style={{ fontSize: '0.8rem', color: '#854d0e', marginBottom: '1rem', backgroundColor: '#fef08a', padding: '0.5rem', borderRadius: '4px' }}>Highlight text to annotate.</div>}
             <p style={{ whiteSpace: 'pre-wrap' }}>{currentQuestion.passage}</p>
           </div>

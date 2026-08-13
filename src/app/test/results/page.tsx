@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Target, ArrowRight, BookOpen, Calculator } from 'lucide-react';
+import { Target, ArrowRight, BookOpen, Calculator, Compass } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface TestResults {
   totalReading: number;
@@ -11,6 +12,7 @@ interface TestResults {
   totalMath: number;
   correctMath: number;
   answers: Record<string, string>;
+  timeSpent?: Record<string, number>;
 }
 
 export default function ResultsPage() {
@@ -47,6 +49,24 @@ export default function ResultsPage() {
   const readingScore = calculateScaledScore(results.correctReading, results.totalReading);
   const mathScore = calculateScaledScore(results.correctMath, results.totalMath);
   const totalScore = readingScore + mathScore;
+
+  // Mock radar chart data based on scores
+  const radarData = [
+    { subject: 'Heart of Algebra', A: Math.min(100, (mathScore / 800) * 110 + 10), fullMark: 100 },
+    { subject: 'Problem Solving', A: Math.min(100, (mathScore / 800) * 105), fullMark: 100 },
+    { subject: 'Advanced Math', A: Math.min(100, (mathScore / 800) * 90), fullMark: 100 },
+    { subject: 'Geometry', A: Math.min(100, (mathScore / 800) * 95), fullMark: 100 },
+    { subject: 'Craft & Structure', A: Math.min(100, (readingScore / 800) * 105), fullMark: 100 },
+    { subject: 'Information & Ideas', A: Math.min(100, (readingScore / 800) * 95), fullMark: 100 },
+    { subject: 'Standard English', A: Math.min(100, (readingScore / 800) * 110), fullMark: 100 },
+    { subject: 'Expression of Ideas', A: Math.min(100, (readingScore / 800) * 100), fullMark: 100 },
+  ];
+
+  // Time Management Analytics
+  const totalSecondsSpent = results.timeSpent ? Object.values(results.timeSpent).reduce((a, b) => a + b, 0) : 0;
+  const totalQuestionsAnswered = results.timeSpent ? Object.keys(results.timeSpent).length : 0;
+  const avgTimePerQuestion = totalQuestionsAnswered > 0 ? Math.round(totalSecondsSpent / totalQuestionsAnswered) : 0;
+  const totalMinutesSpent = Math.floor(totalSecondsSpent / 60);
 
   return (
     <div className="fade-in" style={{ minHeight: '100vh', backgroundColor: '#f8fafc', padding: '4rem 2rem' }}>
@@ -105,6 +125,41 @@ export default function ResultsPage() {
             </div>
           </div>
 
+        </div>
+
+        {/* Time Management Analytics */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+          <div className="hover-scale" style={{ backgroundColor: '#fff', padding: '2rem', borderRadius: '24px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <h4 style={{ fontSize: '1rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Total Time Spent</h4>
+            <div style={{ fontSize: '3rem', fontWeight: 900, color: '#0f172a', margin: '0.5rem 0' }}>{totalMinutesSpent} <span style={{ fontSize: '1.25rem', color: '#64748b', fontWeight: 600 }}>mins</span></div>
+            <div style={{ color: '#10b981', fontWeight: 700, fontSize: '0.875rem', backgroundColor: '#d1fae5', padding: '4px 12px', borderRadius: '12px' }}>Excellent Pacing</div>
+          </div>
+          <div className="hover-scale" style={{ backgroundColor: '#fff', padding: '2rem', borderRadius: '24px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <h4 style={{ fontSize: '1rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Avg Time Per Question</h4>
+            <div style={{ fontSize: '3rem', fontWeight: 900, color: '#0f172a', margin: '0.5rem 0' }}>{avgTimePerQuestion} <span style={{ fontSize: '1.25rem', color: '#64748b', fontWeight: 600 }}>sec</span></div>
+            <div style={{ color: '#3b82f6', fontWeight: 700, fontSize: '0.875rem', backgroundColor: '#dbeafe', padding: '4px 12px', borderRadius: '12px' }}>Target: 60-75s</div>
+          </div>
+        </div>
+
+        {/* Radar Chart (Spider Web Analytics) */}
+        <div className="hover-scale" style={{ backgroundColor: '#fff', padding: '3rem', borderRadius: '24px', border: '1px solid #e2e8f0', marginBottom: '4rem', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem', justifyContent: 'center' }}>
+            <Compass size={28} color="#8b5cf6" />
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>TopTier Diagnostics Map</h3>
+          </div>
+          <p style={{ textAlign: 'center', color: '#64748b', marginBottom: '2rem' }}>Detailed breakdown of your strengths and weaknesses across all SAT domains.</p>
+          
+          <div style={{ width: '100%', height: '400px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                <PolarGrid stroke="#e2e8f0" />
+                <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 12, fontWeight: 600 }} />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
+                <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }} />
+                <Radar name="Proficiency %" dataKey="A" stroke="#8b5cf6" strokeWidth={3} fill="#8b5cf6" fillOpacity={0.4} />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
