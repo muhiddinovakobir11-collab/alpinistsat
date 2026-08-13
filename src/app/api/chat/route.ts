@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     let prompt = `You are an expert SAT tutor for the 'Alpinist SAT' platform. Keep your response concise, helpful, and directly related to the SAT. You MUST communicate with the student in the Uzbek language (O'zbek tilida).`;
     

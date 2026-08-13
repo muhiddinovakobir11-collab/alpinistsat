@@ -29,6 +29,8 @@ export default function TestPage() {
   const [currentPhase, setCurrentPhase] = useState<Phase>('RW1');
   const [timeLeft, setTimeLeft] = useState(PHASE_TIMES.RW1);
   const [isPaused, setIsPaused] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [showModuleOver, setShowModuleOver] = useState(false);
 
   // Data Splitting (Mocking Bluebook Structure)
   const { rw1, rw2, m1, m2 } = useMemo(() => {
@@ -96,7 +98,7 @@ export default function TestPage() {
 
   // Timer
   useEffect(() => {
-    if (isPaused || currentPhase === 'SUBMITTING') return;
+    if (isPaused || currentPhase === 'SUBMITTING' || !hasStarted || showModuleOver || currentPhase === 'BREAK') return;
     
     if (timeLeft <= 0) {
       handlePhaseEnd();
@@ -115,9 +117,20 @@ export default function TestPage() {
 
   // Handle Moving to Next Phase
   const handlePhaseEnd = () => {
-    setCurrentIndex(0); // Reset index for new module
     setShowCalc(false);
     
+    if (currentPhase === 'M2') {
+      setCurrentPhase('SUBMITTING');
+      submitTest();
+    } else {
+      setShowModuleOver(true);
+    }
+  };
+
+  const advanceToNextModule = () => {
+    setCurrentIndex(0);
+    setShowModuleOver(false);
+
     if (currentPhase === 'RW1') {
       setCurrentPhase('RW2');
       setTimeLeft(PHASE_TIMES.RW2);
@@ -130,16 +143,11 @@ export default function TestPage() {
     } else if (currentPhase === 'M1') {
       setCurrentPhase('M2');
       setTimeLeft(PHASE_TIMES.M2);
-    } else if (currentPhase === 'M2') {
-      setCurrentPhase('SUBMITTING');
-      submitTest();
     }
   };
 
   const skipBreak = () => {
-    setCurrentIndex(0);
-    setCurrentPhase('M1');
-    setTimeLeft(PHASE_TIMES.M1);
+    advanceToNextModule();
   };
 
   const saveAndExit = () => {
@@ -280,6 +288,56 @@ export default function TestPage() {
       <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f8fafc' }}>
         <CheckCircle size={64} color="#10b981" className="bounce-anim" style={{ marginBottom: '1rem' }} />
         <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a' }}>Calculating Your Score...</h1>
+      </div>
+    );
+  }
+
+  const startTest = () => {
+    setHasStarted(true);
+    try {
+      document.documentElement.requestFullscreen();
+    } catch(e) {}
+  };
+
+  if (!hasStarted) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: '#f8fafc', padding: '2rem' }}>
+        <div style={{ backgroundColor: '#fff', padding: '4rem', borderRadius: '24px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)', textAlign: 'center', maxWidth: '600px' }}>
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1rem', color: '#0f172a' }}>Digital SAT Mock Test</h1>
+          <p style={{ color: '#64748b', fontSize: '1.125rem', marginBottom: '2rem', lineHeight: 1.6 }}>
+            You are about to begin a full-length adaptive Digital SAT mock test. 
+            Make sure you are in a quiet environment. The test will open in fullscreen mode.
+          </p>
+          <button 
+            onClick={startTest}
+            className="btn btn-primary hover-scale" 
+            style={{ fontSize: '1.25rem', padding: '1rem 3rem', borderRadius: '999px', boxShadow: '0 10px 15px -3px rgba(59, 130, 246, 0.4)' }}
+          >
+            Start Test Now
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (showModuleOver) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: '#f8fafc', padding: '2rem' }}>
+        <div className="fade-in" style={{ backgroundColor: '#fff', padding: '4rem', borderRadius: '24px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.1)', textAlign: 'center', maxWidth: '600px', borderTop: '8px solid #3b82f6' }}>
+          <CheckCircle size={64} color="#10b981" style={{ margin: '0 auto 1.5rem auto' }} />
+          <h1 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1rem', color: '#0f172a' }}>Module Over</h1>
+          <p style={{ color: '#64748b', fontSize: '1.125rem', marginBottom: '2rem', lineHeight: 1.6 }}>
+            You have reached the end of this module. Your answers have been saved. 
+            When you are ready, click below to proceed to the next section.
+          </p>
+          <button 
+            onClick={advanceToNextModule}
+            className="btn btn-primary hover-scale" 
+            style={{ fontSize: '1.125rem', padding: '1rem 3rem', borderRadius: '999px', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 auto' }}
+          >
+            Continue to Next Module <Play size={20} />
+          </button>
+        </div>
       </div>
     );
   }
