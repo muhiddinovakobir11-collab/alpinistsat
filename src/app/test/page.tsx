@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Clock, Calculator, PenTool, MoreVertical, Bookmark, Play, CheckCircle } from 'lucide-react';
+import { Clock, Calculator, PenTool, Save, Bookmark, Play, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Draggable from 'react-draggable';
 import styles from './test.module.css';
@@ -71,6 +71,24 @@ export default function TestPage() {
   const calcRef = useRef(null);
   const passageRef = useRef<HTMLDivElement>(null);
 
+  // Load Saved State
+  useEffect(() => {
+    const savedState = localStorage.getItem('alpinist_test_state');
+    if (savedState) {
+      try {
+        const state = JSON.parse(savedState);
+        setCurrentPhase(state.currentPhase || 'RW1');
+        setTimeLeft(state.timeLeft || PHASE_TIMES.RW1);
+        setCurrentIndex(state.currentIndex || 0);
+        setAnswers(state.answers || {});
+        setMarkedForReview(state.markedForReview || []);
+        setEliminatedOptions(state.eliminatedOptions || {});
+      } catch (e) {
+        console.error('Failed to load state', e);
+      }
+    }
+  }, []);
+
   // Timer
   useEffect(() => {
     if (isPaused || currentPhase === 'SUBMITTING') return;
@@ -114,7 +132,21 @@ export default function TestPage() {
     setTimeLeft(PHASE_TIMES.M1);
   };
 
+  const saveAndExit = () => {
+    const state = {
+      currentPhase,
+      timeLeft,
+      currentIndex,
+      answers,
+      markedForReview,
+      eliminatedOptions
+    };
+    localStorage.setItem('alpinist_test_state', JSON.stringify(state));
+    router.push('/dashboard');
+  };
+
   const submitTest = () => {
+    localStorage.removeItem('alpinist_test_state'); // Clear saved state
     // Collect all answers
     let correctReading = 0;
     let correctMath = 0;
@@ -162,6 +194,36 @@ export default function TestPage() {
     document.addEventListener('mouseup', handleMouseUp);
     return () => document.removeEventListener('mouseup', handleMouseUp);
   }, [isAnnotationMode]);
+
+  // Keyboard Shortcuts (A, B, C, D)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in an input (though there are no inputs yet, good practice)
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      
+      const key = e.key.toUpperCase();
+      if (['A', 'B', 'C', 'D'].includes(key)) {
+        const currentQuestion = currentQuestions[currentIndex];
+        if (!currentQuestion) return;
+        
+        // Check if option exists
+        const optionIndex = key.charCodeAt(0) - 65;
+        if (optionIndex < currentQuestion.options.length) {
+          const isEliminated = (eliminatedOptions[currentQuestion.id] || []).includes(key);
+          if (!isEliminated) {
+            setAnswers(prev => ({ ...prev, [currentQuestion.id]: key }));
+          }
+        }
+      } else if (e.key === 'ArrowRight' && currentIndex < currentQuestions.length - 1) {
+        setCurrentIndex(p => p + 1);
+      } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+        setCurrentIndex(p => p - 1);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentQuestions, currentIndex, eliminatedOptions]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -230,7 +292,7 @@ export default function TestPage() {
       <header className={styles.header}>
         <div className={styles.headerTitle}>
           {sectionName}, {moduleName}
-          <span>Directions</span>
+          <span title="Use keyboard A, B, C, D to answer, Arrow keys to navigate!">Directions ⌨️</span>
         </div>
         
         <div className={styles.timer}>
@@ -255,8 +317,8 @@ export default function TestPage() {
           >
             <PenTool size={18} /> Annotation {isAnnotationMode && '(On)'}
           </button>
-          <button className={styles.toolBtn}>
-            <MoreVertical size={18} /> More
+          <button className={styles.toolBtn} onClick={saveAndExit}>
+            <Save size={18} /> Save & Exit
           </button>
         </div>
       </header>

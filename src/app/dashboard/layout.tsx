@@ -3,6 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import styles from "./layout.module.css";
+import ClientEffects from "@/components/ClientEffects";
 import AIChatWidget from "@/components/AIChatWidget";
 import MobileMenuToggle from "@/components/MobileMenuToggle";
 
@@ -19,6 +20,8 @@ export default async function DashboardLayout({
 
   return (
     <div className={styles.dashboardContainer} style={{ position: 'relative' }}>
+      <ClientEffects />
+
       {/* Ambient Animated Background */}
       <div className="ambient-bg"></div>
 

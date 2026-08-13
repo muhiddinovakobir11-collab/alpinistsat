@@ -287,6 +287,72 @@ body > div[style*="position:absolute"][style*="bottom"][style*="right"],
   }
 }
 
+/* Magic Cursor Glow */
+#cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  transition: width 0.3s, height 0.3s, background 0.3s;
+}
+:root.dark #cursor-glow {
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 70%);
+}
+
+/* Dynamic Island */
+.dynamic-island {
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #000;
+  color: #fff;
+  border-radius: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  z-index: 10000;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  overflow: hidden;
+  height: 40px;
+  min-width: 150px;
+}
+.dynamic-island:hover {
+  height: 60px;
+  min-width: 250px;
+  border-radius: 20px;
+}
+.dynamic-island-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+/* Focus Mode */
+body.focus-mode .sidebar,
+body.focus-mode .marquee-container,
+body.focus-mode .header {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.5s ease;
+}
+body.focus-mode .mainContent {
+  margin-left: 0 !important;
+  transition: margin 0.5s ease;
+}
+
 /* Ambient Animated Background */
 .ambient-bg {
   position: fixed;
