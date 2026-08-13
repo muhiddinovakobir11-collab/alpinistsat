@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { BookOpen, Calendar, Target, CheckCircle2, TrendingUp, Zap, Bell, Flame, Medal, Volume2, Save, X, Moon, Sun, Quote, Play, Pause, RotateCcw, Trophy, Clock, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import confetti from 'canvas-confetti';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
-import { Trophy, Clock, ChevronUp } from 'lucide-react';
 import styles from './page.module.css';
 
 export default function DashboardPage() {
